@@ -1,0 +1,51 @@
+\section*{Planteo del Problema}
+
+\subsection*{Conjuntos}
+\begin{itemize}
+    \item $G$: Conjunto de grupos de usuarios (indexados por $g$).
+    \item $S$: Conjunto de servidores (indexados por $s$).
+\end{itemize}
+
+\subsection*{Datos}
+\begin{itemize}
+    \item $d_g$: Demanda de solicitudes por minuto del grupo de usuarios $g$.
+    \item $c_{g,s}^{bw}$: Costo de ancho de banda por solicitud para el grupo de usuarios $g$ hacia el servidor $s$.
+    \item $L_{g,s}$: Latencia promedio (ms) entre el grupo $g$ y el servidor $s$.
+    \item $M_s$: Carga máxima de solicitudes por minuto que puede soportar el servidor $s$.
+\end{itemize}
+
+\subsection*{Parámetros}
+\begin{itemize}
+    \item SLA de latencia: $L_{\text{SLA}} = 400\,\text{ms}$.
+    \item Costo por ms excedido: $c_{\text{lat}} = 0.0000001\,\text{USD/ms}$.
+\end{itemize}
+
+\subsection*{Variables de Decisión}
+\begin{itemize}
+    \item $x_{g,s} \geq 0$: Cantidad de solicitudes por minuto del grupo $g$ que serán atendidas por el servidor $s$.
+\end{itemize}
+
+\subsection*{Función de Costo por Latencia}
+Si $L_{g,s} > L_{\text{SLA}}$, el costo por latencia por solicitud es $(L_{g,s} - L_{\text{SLA}}) \cdot c_{\text{lat}}$. Si $L_{g,s} \leq L_{\text{SLA}}$, el costo es 0.
+
+\subsection*{Función Objetivo}
+Minimizar el costo total por minuto:
+\begin{equation}
+\min \sum_{g \in G}\sum_{s \in S} x_{g,s} \left( c_{g,s}^{bw} + \max(L_{g,s}-L_{\text{SLA}}, 0) \cdot c_{\text{lat}} \right)
+\end{equation}
+
+\subsection*{Restricciones}
+1. \textbf{Satisfacción de la Demanda por cada Grupo de Usuarios:}
+\begin{equation}
+\sum_{s \in S} x_{g,s} = d_g \quad \forall g \in G
+\end{equation}
+
+2. \textbf{Capacidad Máxima de los Servidores:}
+\begin{equation}
+\sum_{g \in G} x_{g,s} \leq M_s \quad \forall s \in S
+\end{equation}
+
+3. \textbf{No Negatividad:}
+\begin{equation}
+x_{g,s} \geq 0 \quad \forall g \in G, \forall s \in S
+\end{equation}
